@@ -1,52 +1,52 @@
 package com.cw1;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import static com.cw1.Visitor.getItems;
 
-/**
- * Hello world!
- *
- */
 public class App {
+    private static final int NUMBER_OF_VISITORS = 8;
+    private static List<Visitor> visitors;
+    private static Outlet outlet;
+    private static SimulationFrame simulationFrame;
+
     public static void main(String[] args) {
-//        System.out.println("Hello World!");
 
-//        Counter counter = new Counter();
-//        Thread t1 = new Thread(counter);
-//        t1.start();
-        IceArena iceArena = IceArena.getInstance(10);
-
-        List<Visitor> visitors = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        SkatingArea skatingArea = SkatingArea.getInstance();
+        IceArena iceArena = IceArena.getInstance();
+        simulationFrame = new SimulationFrame(iceArena);
+        outlet = new Outlet(iceArena);
+        visitors = new ArrayList<>();
+        for (int i = 0; i < NUMBER_OF_VISITORS; i++) {
             Visitor visitor = new Visitor("Visitor " + i);
-            visitor.setOutlet(new Outlet(iceArena, visitor));
+            visitor.setOutlet(outlet);
             visitor.setIceArena(iceArena);
+            visitor.setSkatingArea(skatingArea);
             visitors.add(visitor);
             new Thread(visitor).start();
         }
+        skatingArea.setSimulationFrame(simulationFrame);
+        QueuePanel.getInstance().updateQueue(visitors);
 
-//        List<Thread> threads = new ArrayList<>();
-//        for (Visitor visitor : visitors) {
-//            Outlet outlet = new Outlet(iceArena, visitor);
-//            visitor.setOutlet(outlet);
-//            Runnable runnable = outlet::processOrders;
-//            Thread thread = new Thread(runnable);
-//            threads.add(thread);
-//        }
-//
-//        for (Visitor visitor : visitors) {
-//            List<Item> items = getItems();
-//            Order order = new Order(items, visitor);
-//            visitor.placeOrder(order);
-//        }
-//
-//        for (Thread thread : threads) {
-//            thread.start();
-//        }
+        JFrame frame = new JFrame("Skating Frame");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.add(simulationFrame);
+        frame.setVisible(true);
+
 
     }
 
+    public static List<Visitor> getVisitors() {
+        return visitors;
+    }
+
+    public static Outlet getOutlet() {
+        return outlet;
+    }
+
+    public static SimulationFrame getSimulationFrame() {
+        return simulationFrame;
+    }
 }
