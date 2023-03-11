@@ -44,12 +44,12 @@ public class Visitor implements Runnable {
             }
 
             if (!borrowedItems.isEmpty() && !isSkating) {
-                System.out.println(id + " has received order: " + orders.get(orders.size() - 1));
+                System.out.println(id + " has received order: " + order);
                 System.out.println("borrowed Items: " + borrowedItems);
                 skatingArea.skate(this);
                 System.out.println(id + " has finished skating. Returning Items: " + borrowedItems);
                 try {
-                    while (!outlet.returnItems(orders.get(orders.size() - 1))) {
+                    while (!outlet.returnItems(order)) {
                         Thread.sleep(1000);
                     }
                 } catch (InterruptedException e) {

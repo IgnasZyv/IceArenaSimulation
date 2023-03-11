@@ -7,7 +7,6 @@ public class StatisticsPanel extends JPanel {
     private static JLabel stockLeftLabel;
     private static JLabel skatingVisitorsLabel;
     private static JLabel waitingVisitorsLabel;
-    private static IceArena iceArena = null;
     private static JLabel skatesLabel;
     private static JLabel helmetLabel;
     private static JLabel glovesLabel;
@@ -20,7 +19,7 @@ public class StatisticsPanel extends JPanel {
                 BorderFactory.createEmptyBorder(30, 50, 0, 0) // add Margin
         ));
 
-        iceArena = IceArena.getInstance();
+        IceArena iceArena = IceArena.getInstance();
 
         skatesLabel = new JLabel("Skates: " + iceArena.getSkates().size());
         skatesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
@@ -49,20 +48,11 @@ public class StatisticsPanel extends JPanel {
     }
 
     public static void updateItems(HashMap<ItemType, Integer> itemQuantity) {
-
         skatesLabel.setText("Skates: " + itemQuantity.get(ItemType.SKATES));
         helmetLabel.setText("Helmets: " + itemQuantity.get(ItemType.HELMET));
         glovesLabel.setText("Gloves: " + itemQuantity.get(ItemType.GLOVES));
         penguinLabel.setText("Penguins: " + itemQuantity.get(ItemType.PENGUIN));
 
-    }
-
-    public static void updateSkatingVisitors(int skatingVisitors) {
-        skatingVisitorsLabel.setText("Skating visitors: " + skatingVisitors);
-    }
-
-    public static void updateWaitingVisitors(int waitingVisitors) {
-        waitingVisitorsLabel.setText("Waiting visitors: " + waitingVisitors);
     }
 
 }

@@ -12,8 +12,11 @@ public class IceArenaPanel extends JPanel {
 
     private IceArenaPanel() {
         this.skatingVisitors = new ArrayList<>();
-        setBorder(BorderFactory.createTitledBorder("Ice Arena"));
-//        setPreferredSize(new Dimension(200, 400));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Statistics"),
+                BorderFactory.createEmptyBorder(30, 50, 0, 0) // add Margin
+        ));
 
     }
 
@@ -32,9 +35,6 @@ public class IceArenaPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
-        int width = getWidth() - 200;
-        int height = getHeight() - 200;
         int ovalSize = 5;
 //
 //        // Draw ice rink
@@ -45,7 +45,7 @@ public class IceArenaPanel extends JPanel {
         g.setColor(Color.RED);
 
 
-        int xCenter = getWidth() / 2;
+        int xCenter = (getWidth() / 2) - 100;
         int yStart = 50;
         int yStep = 50;
 
@@ -53,7 +53,7 @@ public class IceArenaPanel extends JPanel {
         drawVisitors(g, xCenter, yStart, yStep, skatingVisitors);
     }
 
-    static void drawVisitors(Graphics g, int xCenter, int yStart, int yStep, List<Visitor> visitors) {
+    void drawVisitors(Graphics g, int xCenter, int yStart, int yStep, List<Visitor> visitors) {
         if (visitors == null) {
             return;
         }
@@ -66,8 +66,12 @@ public class IceArenaPanel extends JPanel {
             } else {
                 g.setColor(Color.BLACK);
             }
-            g.fillOval(xCenter - 10, y - 10, 20, 20);
+
+            g.fillOval(xCenter, y - 10, 15, 15);
             g.drawString(visitor.getId(), xCenter + 20, y + 5);
+            if (visitor.getOrder() != null) {
+                g.drawString(visitor.getOrder().getItemList().toString(), xCenter, y + 25);
+            }
         }
     }
 

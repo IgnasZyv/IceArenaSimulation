@@ -72,6 +72,8 @@ public class IceArena {
             System.out.println(getInventoryString());
             order.getVisitor().getBorrowedItems().clear();
             order.setStatus(OrderStatus.Completed);
+            order.getVisitor().addOrder(order);
+            order.getVisitor().setOrder(null);
 
             synchronized (this) {
                 notifyAll();
@@ -123,8 +125,8 @@ public class IceArena {
             // Add the order to the visitor's list of orders
             order.setStatus(OrderStatus.Ready);
             order.getVisitor().setInQueue(false);
-            visitor.addOrder(order);
-            visitor.setOrder(null);
+//            visitor.addOrder(order);
+//            visitor.setOrder(null);
             System.out.println(getInventoryString());
             System.out.println(order + " fulfilled.");
             StatisticsPanel.updateItems(getInventory());

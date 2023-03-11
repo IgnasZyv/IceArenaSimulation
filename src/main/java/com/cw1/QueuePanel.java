@@ -9,7 +9,11 @@ public class QueuePanel extends JPanel {
     private List<Visitor> visitors;
 
     private QueuePanel() {
-        // TOOD: Actually store vistors in a queue in outlet which will just render the list and forget about it. More modular and shit for memory.
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Queue"),
+                BorderFactory.createEmptyBorder(30, 0, 0, 0) // add Margin
+        ));
     }
 
     public static synchronized QueuePanel getInstance() {
@@ -23,14 +27,14 @@ public class QueuePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        int xCenter = getWidth() / 2;
+        int xCenter = (getWidth() / 2) - 100;
         int yStart = 50;
         int yStep = 50;
 
         g.setColor(Color.BLACK);
-        g.drawString("Queue", xCenter - 20, yStart - 20);
+        g.drawString("Queue", xCenter - 100, yStart - 20);
 
-        IceArenaPanel.drawVisitors(g, xCenter, yStart, yStep, visitors);
+        IceArenaPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitors);
     }
 
     public void updateQueue(List<Visitor> skaters) {
