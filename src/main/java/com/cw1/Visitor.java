@@ -3,7 +3,6 @@ package com.cw1;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 public class Visitor implements Runnable {
     private static final Object lock = new Object();
@@ -14,7 +13,6 @@ public class Visitor implements Runnable {
     private List<Item> borrowedItems;
     private List<Order> orders;
     private Order order;
-    private Semaphore semaphore;
 
     private Boolean isSkating = false;
     private Boolean inQueue = false;
@@ -43,7 +41,6 @@ public class Visitor implements Runnable {
                         throw new RuntimeException(e);
                     }
                 }
-
             }
 
             if (!borrowedItems.isEmpty() && !isSkating) {
@@ -52,86 +49,15 @@ public class Visitor implements Runnable {
                 skatingArea.skate(this);
                 System.out.println(id + " has finished skating. Returning Items: " + borrowedItems);
                 try {
-                    iceArena.returnItems(orders.get(orders.size() - 1));
+                    while (!outlet.returnItems(orders.get(orders.size() - 1))) {
+                        Thread.sleep(1000);
+                    }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
     }
-
-
-//
-//    @Override
-//    public void run() {
-//        while (true) {
-//            try {
-//                Thread.sleep(1000);
-//                if (borrowedItems.isEmpty() && skatingArea.isSkating(this)) {
-//                    Order order = new Order(getItems(), this);
-//                    System.out.println(id + " is going to the queue. " + order);
-//                    currentOrder = order;
-//                    iceArena.goToVisitorQueue(this);
-//                    synchronized (iceArena) {
-//                        while (order.getStatus() != OrderStatus.Ready) {
-//                            iceArena.wait();
-//                        }
-//                    }
-//                    if (!borrowedItems.isEmpty() && skatingArea.isSkating(this)) {
-//                        System.out.println(id + " has received order: " + order);
-//                        skatingArea.skate(this);
-//                        System.out.println(id + " has finished skating. Returning Items: " + borrowedItems);
-//                        iceArena.returnItems(order);
-//                    }
-//                    synchronized (iceArena) {
-//                        while (order.getStatus() != OrderStatus.Completed) {
-//                            iceArena.wait();
-//                        }
-//                    }
-//                }
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
-
-//
-//    @Override
-//    public void run() {
-//        while (true) {
-//            try {
-//                Thread.sleep(1000);
-//                if (borrowedItems.isEmpty() && !skatingArea.isSkating(this)) {
-//                    Order order = new Order(getItems(), this);
-//                    System.out.println(id + " is placing order: " + order);
-//                    placeOrder(order);
-//                    order.setStatus(OrderStatus.Waiting);
-//
-//                    while (order.getStatus() != OrderStatus.Ready) {
-//                        Thread.sleep(1000);
-//                    }
-//
-//                    if (!borrowedItems.isEmpty() && !skatingArea.isSkating(this)) {
-//                        System.out.println(id + " has received order: " + order);
-//                        skatingArea.skate(this);
-//
-//                        System.out.println(id + " has finished skating. Returning Items: " + borrowedItems);
-//
-//                        returnItems(order);
-//                    }
-//
-//                    while (order.getStatus() != OrderStatus.Completed) {
-//                        Thread.sleep(10000);
-//                    }
-//                }
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//    }
-
 
     public static List<Item> getItems() {
         List<ItemType> itemTypes = new ArrayList<>(ItemType.getItems());
@@ -166,15 +92,6 @@ public class Visitor implements Runnable {
             }
         }
         return chosenItems;
-    }
-
-
-    public void waitUntilReady(Order order) throws InterruptedException {
-        synchronized (iceArena) {
-            while (order.getStatus() != OrderStatus.Ready) {
-                wait();
-            }
-        }
     }
 
     public synchronized String getId() {

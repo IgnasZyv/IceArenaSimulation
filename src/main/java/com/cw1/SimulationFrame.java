@@ -5,9 +5,8 @@ import java.awt.*;
 
 public class SimulationFrame extends JPanel {
 
-//    private final SimulationPanel simulationPanel;
     private final QueuePanel queuePanel;
-//    private final IceArenaPanel iceArenaPanel;
+    private final IceArenaPanel iceArenaPanel;
     private final StatisticsPanel statisticsPanel;
 
     public SimulationFrame(IceArena iceArena) {
@@ -15,9 +14,9 @@ public class SimulationFrame extends JPanel {
 
         setLayout(new GridLayout(1,3));
 
-//        iceArenaPanel = new IceArenaPanel(visitors);
+        iceArenaPanel = IceArenaPanel.getInstance();
 //        iceArenaPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
-//        add(iceArenaPanel, BorderLayout.EAST);
+        add(iceArenaPanel, BorderLayout.EAST);
 
         queuePanel = QueuePanel.getInstance();
 //        queuePanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
@@ -32,7 +31,6 @@ public class SimulationFrame extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-//        simulationPanel.paintComponent(g);
     }
 
     public QueuePanel getQueuePanel() {

@@ -31,9 +31,10 @@ public class SkatingArea {
                 }
             }
             skaters.add(visitor);
+            IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
             List<Visitor> inQueue = App.getVisitors();
             inQueue.removeAll(skaters);
-            getQueuePanel().updateQueue(inQueue);
+            QueuePanel.getInstance().updateQueue(inQueue);
         }
         try {
             System.out.println(visitor.getId() + " is skating");
@@ -46,6 +47,7 @@ public class SkatingArea {
         synchronized (lock) {
             getQueuePanel().addQueue(skaters);
             skaters.remove(visitor);
+            IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
             System.out.println(visitor.getId() + " has finished skating");
             lock.notifyAll();
         }

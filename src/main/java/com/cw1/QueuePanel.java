@@ -30,18 +30,7 @@ public class QueuePanel extends JPanel {
         g.setColor(Color.BLACK);
         g.drawString("Queue", xCenter - 20, yStart - 20);
 
-        for (int i = 0; i < visitors.size(); i++) {
-            Visitor visitor = visitors.get(i);
-            int y = yStart + i * yStep;
-
-            if (visitor.getInQueue()) {
-                g.setColor(Color.RED);
-            } else {
-                g.setColor(Color.BLACK);
-            }
-            g.fillOval(xCenter - 10, y - 10, 20, 20);
-            g.drawString(visitor.getId(), xCenter + 20, y + 5);
-        }
+        IceArenaPanel.drawVisitors(g, xCenter, yStart, yStep, visitors);
     }
 
     public void updateQueue(List<Visitor> skaters) {
