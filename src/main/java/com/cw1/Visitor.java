@@ -9,6 +9,7 @@ public class Visitor implements Runnable {
     private String id;
     private final IceArena iceArena = IceArena.getInstance();
     private final SkatingArea skatingArea = SkatingArea.getInstance();
+    private final DiningHall diningHall = DiningHall.getInstance();
     private final Outlet outlet = App.getOutlet();
     private List<Item> borrowedItems;
     private List<Order> orders;
@@ -56,6 +57,13 @@ public class Visitor implements Runnable {
                     throw new RuntimeException(e);
                 }
             }
+
+            if (borrowedItems.isEmpty() && !isSkating) {
+                System.out.println(id + " is going to eat");
+                diningHall.dine(this);
+                System.out.println(id + " has finished eating");
+            }
+
         }
     }
 

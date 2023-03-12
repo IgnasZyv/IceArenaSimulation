@@ -14,7 +14,7 @@ public class IceArenaPanel extends JPanel {
         this.skatingVisitors = new ArrayList<>();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Statistics"),
+                BorderFactory.createTitledBorder("Ice Arena"),
                 BorderFactory.createEmptyBorder(30, 50, 0, 0) // add Margin
         ));
 
