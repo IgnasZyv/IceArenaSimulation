@@ -2,8 +2,11 @@ package com.cw1;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Order {
+    private final Lock lock;
     private static AtomicInteger orderCounter = new AtomicInteger(0);
     private final int orderNumber;
     private final List<Item> itemList;
@@ -11,6 +14,7 @@ public class Order {
     private OrderStatus status;
 
     public Order(List<Item> itemList, Visitor visitor) {
+        this.lock = new ReentrantLock();
         this.itemList = itemList;
         this.visitor = visitor;
         this.orderNumber = orderCounter.getAndIncrement();
@@ -41,12 +45,19 @@ public class Order {
         this.status = status;
     }
 
-    public synchronized void waitUntilCanFulfill() throws InterruptedException {
-        wait();
+    public void waitUntilCanFulfill() throws InterruptedException {
+        synchronized (lock) {
+            while (status != OrderStatus.Ready) {
+                lock.wait();
+            }
+        }
+
     }
 
-    public synchronized void notifyReady() {
-        notify();
+    public void notifyReady() {
+        synchronized (lock) {
+            lock.notify();
+        }
     }
 
 }

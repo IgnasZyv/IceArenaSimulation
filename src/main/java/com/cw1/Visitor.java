@@ -9,7 +9,7 @@ public class Visitor implements Runnable {
     private String id;
     private final IceArena iceArena = IceArena.getInstance();
     private final SkatingArea skatingArea = SkatingArea.getInstance();
-    private final DiningHall diningHall = DiningHall.getInstance();
+    private final DiningHall diningHall = DiningHall.getInstance(App.DINING_HALL_CAPACITY);
     private final Outlet outlet = App.getOutlet();
     private List<Item> borrowedItems;
     private List<Order> orders;
@@ -26,46 +26,53 @@ public class Visitor implements Runnable {
         order = new Order(getItems(), this);
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            System.out.println(id + "starting");
-            if (borrowedItems.isEmpty() && !skatingArea.isSkating(this)) {
-                if (order == null) {
-                    order = new Order(getItems(), this);
+        @Override
+        public void run() {
+            while (true) {
+                if (!borrowedItems.isEmpty()) {
+                    borrowedItems = new ArrayList<>();
                 }
-                System.out.println(id + " is going to place order: " + order);
-                synchronized (outlet) {
+
+                if (!inQueue) {
+                    if (order == null) {
+                        order = new Order(getItems(), this);
+                    }
+                    System.out.println(id + " is going to place order: " + order);
+                    synchronized (outlet) {
+                        try {
+                            QueuePanel.getInstance().addQueue(this);
+                            outlet.placeOrder(order);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                if (!borrowedItems.isEmpty() && !isSkating && !inQueue) {
+                    System.out.println(id + " has received order: " + order);
+                    System.out.println("borrowed Items: " + borrowedItems);
+                    skatingArea.skate(this);
+                    System.out.println(id + " has finished skating. Returning Items: " + borrowedItems);
                     try {
-                        outlet.placeOrder(order);
+                        while (!outlet.returnItems(order)) {
+                            Thread.sleep(1000);
+                        }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
-            }
 
-            if (!borrowedItems.isEmpty() && !isSkating) {
-                System.out.println(id + " has received order: " + order);
-                System.out.println("borrowed Items: " + borrowedItems);
-                skatingArea.skate(this);
-                System.out.println(id + " has finished skating. Returning Items: " + borrowedItems);
-                try {
-                    while (!outlet.returnItems(order)) {
-                        Thread.sleep(1000);
+                if (borrowedItems.isEmpty() && !inQueue) {
+                    System.out.println(id + " is going to eat");
+                    try {
+                        diningHall.enter(this);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(id + " has finished eating");
                 }
             }
-
-            if (borrowedItems.isEmpty() && !isSkating) {
-                System.out.println(id + " is going to eat");
-                diningHall.dine(this);
-                System.out.println(id + " has finished eating");
-            }
-
         }
-    }
 
     public static List<Item> getItems() {
         List<ItemType> itemTypes = new ArrayList<>(ItemType.getItems());

@@ -5,25 +5,26 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueuePanel extends JPanel {
-    private static QueuePanel instance = null;
-    private List<Visitor> visitors;
+public class DiningHallQueue extends JPanel {
+    private static DiningHallQueue instance = null;
+    private final List<Visitor> visitors;
 
-    private QueuePanel() {
+    private DiningHallQueue() {
         this.visitors = new ArrayList<>();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Ice Arena Queue"),
+                BorderFactory.createTitledBorder("Dining Hall Queue"),
                 BorderFactory.createEmptyBorder(30, 0, 0, 0) // add Margin
         ));
     }
 
-    public static synchronized QueuePanel getInstance() {
+    public static DiningHallQueue getInstance() {
         if (instance == null) {
-            instance = new QueuePanel();
+            instance = new DiningHallQueue();
         }
         return instance;
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -34,33 +35,21 @@ public class QueuePanel extends JPanel {
         int yStep = 50;
 
         g.setColor(Color.BLACK);
-        g.drawString("Queue", xCenter - 100, yStart - 20);
+        g.drawString("Dining Hall", xCenter - 100, yStart - 20);
 
         IceArenaPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitors);
     }
 
-    public void addQueue(Visitor visitor) {
+    public void addVisitor(Visitor visitor) {
         visitors.add(visitor);
-        StatisticsPanel.updateWaitingVisitors(visitors.size());
+        StatisticsPanel.updateWaitingDiningVisitors(visitors.size());
         repaint();
     }
 
-    public void removeVisitor(Visitor visitor) {
+    public void removeQueue(Visitor visitor) {
         visitors.remove(visitor);
-        StatisticsPanel.updateWaitingVisitors(visitors.size());
+        StatisticsPanel.updateWaitingDiningVisitors(visitors.size());
         repaint();
     }
 
-    public void setVisitors(List<Visitor> visitors) {
-        this.visitors = visitors;
-        repaint(); // repaint the panel
-    }
-
-    public List<Visitor> getVisitors() {
-        return visitors;
-    }
-
-    public void redraw() {
-        repaint();
-    }
 }

@@ -6,7 +6,8 @@ import java.util.List;
 
 
 public class App {
-    private static final int NUMBER_OF_VISITORS = 8;
+    public static final int NUMBER_OF_VISITORS = 20;
+    public static final int DINING_HALL_CAPACITY = 3;
     private static List<Visitor> visitors;
     private static Outlet outlet;
     private static SimulationFrame simulationFrame;
@@ -27,11 +28,11 @@ public class App {
             new Thread(visitor).start();
         }
         skatingArea.setSimulationFrame(simulationFrame);
-        QueuePanel.getInstance().updateQueue(visitors);
+//        QueuePanel.getInstance().updateQueue(visitors);
 
         JFrame frame = new JFrame("Skating Frame");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 600);
+        frame.setSize(1600, 1000);
         frame.add(simulationFrame);
         frame.setVisible(true);
 
@@ -49,4 +50,6 @@ public class App {
     public static SimulationFrame getSimulationFrame() {
         return simulationFrame;
     }
+
+
 }

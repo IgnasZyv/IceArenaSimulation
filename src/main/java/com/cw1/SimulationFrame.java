@@ -13,7 +13,7 @@ public class SimulationFrame extends JPanel {
     public SimulationFrame(IceArena iceArena) {
 //        this.simulationPanel = new SimulationPanel(visitors);
 
-        setLayout(new GridLayout(0,4));
+        setLayout(new GridLayout(0,5));
 
         queuePanel = QueuePanel.getInstance();
 //        queuePanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
@@ -22,6 +22,9 @@ public class SimulationFrame extends JPanel {
         iceArenaPanel = IceArenaPanel.getInstance();
 //        iceArenaPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
         add(iceArenaPanel);
+
+        DiningHallQueue diningHallQueue = DiningHallQueue.getInstance();
+        add(diningHallQueue);
 
         diningHallPanel = DiningHallPanel.getInstance();
         add(diningHallPanel);

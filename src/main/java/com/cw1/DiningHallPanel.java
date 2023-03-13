@@ -9,7 +9,7 @@ public class DiningHallPanel extends JPanel {
     private static DiningHallPanel instance = null;
     private final List<Visitor> visitorList;
 
-    public DiningHallPanel() {
+    private DiningHallPanel() {
         visitorList = new ArrayList<>();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -41,13 +41,15 @@ public class DiningHallPanel extends JPanel {
         IceArenaPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitorList);
     }
 
-    public void addQueue(Visitor visitor) {
+    public void addVisitor(Visitor visitor) {
         visitorList.add(visitor);
+        StatisticsPanel.updateDiningVisitors(visitorList.size());
         repaint();
     }
 
     public void removeQueue(Visitor visitor) {
         visitorList.remove(visitor);
+        StatisticsPanel.updateDiningVisitors(visitorList.size());
         repaint();
     }
 

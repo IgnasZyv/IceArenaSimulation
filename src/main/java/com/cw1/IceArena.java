@@ -3,6 +3,7 @@ package com.cw1;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class IceArena {
@@ -17,7 +18,7 @@ public class IceArena {
     private IceArena() {
 
         List<List<Item>> borrowedItems = new ArrayList<>();
-        int maxItems = 3; // set max items
+        int maxItems = 5; // set max items
 
         ArrayList<Item> skateItems = new ArrayList<>();
         ArrayList<Item> helmetItems = new ArrayList<>();
@@ -46,7 +47,6 @@ public class IceArena {
     public Boolean returnItems(Order order) throws InterruptedException {
             List<ItemType> itemTypes = new ArrayList<>();
             for (Item item : order.getItemList()) {
-
                 switch (item.getType()) {
                     case SKATES -> {
                         skates.get().add(item);
@@ -67,22 +67,28 @@ public class IceArena {
                     default -> System.out.println("IceArena: addItems: " + "failed to add " + item);
                 }
             }
-            StatisticsPanel.updateItems(getInventory());
+            StatisticsPanel.updateItems(getInventory()); // update inventory gui
             System.out.println("IceArena: Added to storage" + itemTypes);
             System.out.println(getInventoryString());
-            order.getVisitor().getBorrowedItems().clear();
+            order.getVisitor().getBorrowedItems().clear(); // clear visitors borrowed items
+            order.getVisitor().setInQueue(false); // remove visitor from queue
             order.setStatus(OrderStatus.Completed);
-            order.getVisitor().addOrder(order);
-            order.getVisitor().setOrder(null);
 
-            synchronized (this) {
+            SkatingArea.getSkaters().remove(order.getVisitor()); // remove visitor from skating area gui
+            StatisticsPanel.updateSkatingVisitors(SkatingArea.getSkaters().size()); // update the statistics panel for skating visitor count
+            IceArenaPanel.getInstance().updateSkatingVisitors(SkatingArea.getSkaters()); // update skating area gui
+
+            order.getVisitor().addOrder(order); // add order to the list of visitors orders
+            order.getVisitor().setOrder(null); // set the current order to null so the visitor can borrow again
+
+            synchronized (this) { // notify all threads waiting on the ice arena object that items have been returned
                 notifyAll();
             }
 
-            App.getOutlet().notifyOutlet();
+            // notify the outlet that the storage has been updated
+            OutletThread.getInstance(App.getOutlet()).notifyStorageUpdated();
 
-
-        Thread.sleep(1000);
+        Thread.sleep(new Random().nextInt(1000, 2000));
         return true;
     }
 
@@ -117,21 +123,19 @@ public class IceArena {
     }
 
     public synchronized Boolean completeOrder(Order order) throws InterruptedException {
-        if (canFulfillOrder(order)) {
-            List<Item> borrowedItems = borrowItems(order);
+        if (canFulfillOrder(order)) { // check if items are available
+            List<Item> borrowedItems = borrowItems(order); // borrow items
 
             Visitor visitor = order.getVisitor();
             visitor.setBorrowedItems(borrowedItems);
-            // Add the order to the visitor's list of orders
             order.setStatus(OrderStatus.Ready);
             order.getVisitor().setInQueue(false);
-//            visitor.addOrder(order);
-//            visitor.setOrder(null);
+
             System.out.println(getInventoryString());
             System.out.println(order + " fulfilled.");
-            StatisticsPanel.updateItems(getInventory());
+            StatisticsPanel.updateItems(getInventory()); // update inventory gui
             notifyAll();
-            Thread.sleep(1000);
+            Thread.sleep(new Random().nextInt(1000, 2000));
             return true;
         }
         return false;
@@ -144,34 +148,30 @@ public class IceArena {
                 case SKATES -> {
                     if (skates.get().size() > 0) {
                         borrowed.add(skates.get().remove(0));
-//                        System.out.println("Borrowed " + item.getType() + " left: " + skates.size() + " " + order);
                     }
                 }
                 case GLOVES -> {
                     if (gloves.get().size() > 0) {
                         borrowed.add(gloves.get().remove(0));
-//                        System.out.println("Borrowed " + item.getType() + " left: " + gloves.size() + " " + order);
                     }
                 }
                 case HELMET -> {
                     if (helmets.get().size() > 0) {
                         borrowed.add(helmets.get().remove(0));
-//                        System.out.println("Borrowed " + item.getType() + " left: " + helmets.size() + " " + order);
                     }
                 }
                 case PENGUIN -> {
                     if (penguins.get().size() > 0) {
                         borrowed.add(penguins.get().remove(0));
-//                        System.out.println("Borrowed " + item.getType() + " left: " + penguins.size() + " " + order);
                     }
                 }
             }
         }
         System.out.println("Borrowed " + borrowed.toString() + " for " + order);
-        order.getVisitor().setBorrowedItems(borrowed);
-        order.setStatus(OrderStatus.Ready);
-        StatisticsPanel.updateItems(getInventory());
-        Thread.sleep(1000);
+        order.getVisitor().setBorrowedItems(borrowed); // set borrowed items for visitor
+        order.setStatus(OrderStatus.Ready); // set order status to ready
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        Thread.sleep(new Random().nextInt(1000, 2000));
         return borrowed;
     }
 

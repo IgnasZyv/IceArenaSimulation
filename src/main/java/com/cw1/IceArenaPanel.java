@@ -69,10 +69,17 @@ public class IceArenaPanel extends JPanel {
 
             g.fillOval(xCenter, y - 10, 15, 15);
             g.drawString(visitor.getId(), xCenter + 20, y + 5);
-            if (visitor.getOrder() != null) {
+            if (visitor.getOrder() != null && visitor.getOrder().getStatus() == OrderStatus.Returning) {
+                g.drawString(visitor.getOrder().getItemList().toString() + " Returning...", xCenter, y + 25);
+            } else if (visitor.getOrder() != null) {
                 g.drawString(visitor.getOrder().getItemList().toString(), xCenter, y + 25);
+
             }
         }
+    }
+
+    public void redraw() {
+        repaint();
     }
 
 }

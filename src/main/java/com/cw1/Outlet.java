@@ -22,12 +22,13 @@ public class Outlet {
         //private Queue<Order> visitorQueue = new LinkedList<>();
         LinkedBlockingQueue<Order> returnQueue = new LinkedBlockingQueue<>();
         this.waitingQueue = new LinkedBlockingQueue<>();
-        OutletThread outletThread = new OutletThread(this);
+        OutletThread outletThread = OutletThread.getInstance(outlet);
         outletThread.start();
     }
 
     public synchronized void placeOrder(Order order) throws InterruptedException {
-        order.getVisitor().setInQueue(true);
+//        order.getVisitor().setInQueue(true);
+
         boolean orderPlaced = false;
         if (!waitingQueue.contains(order)) {
             if (canFulfillOrder(order)) {
@@ -38,6 +39,7 @@ public class Outlet {
 
             if (!orderPlaced) {
                 System.out.println(order.getVisitor() + ": Cannot place order, waiting for items to be returned");
+                order.getVisitor().setInQueue(true);
                 waitingQueue.put(order);
                 HashMap<String, String> map = new HashMap<>();
                 for (Order ord : waitingQueue) {
@@ -48,12 +50,23 @@ public class Outlet {
                     wait();
                 }
             }
+        } else {
+            if (order.getItemList() == null) {
+                System.out.println("outlet: No items to order");
+                order.getVisitor().setOrder(null);
+                order.getVisitor().setInQueue(false);
+                order.getVisitor().setBorrowedItems(null);
+                return;
+            }
         }
 
     }
 
     public synchronized boolean returnItems(Order returnOrder) throws InterruptedException {
-        System.out.println("outlet: Items returned: " + returnOrder.getItemList());
+        System.out.println("outlet: Items for return: " + returnOrder.getItemList() + " from visitor: " + returnOrder.getVisitor().getId());
+        returnOrder.getVisitor().setInQueue(true);
+        returnOrder.setStatus(OrderStatus.Returning);
+        IceArenaPanel.getInstance().redraw();
         if (iceArena.returnItems(returnOrder)) {
             System.out.println("outlet: Items returned to ice arena");
             return true;
@@ -63,8 +76,11 @@ public class Outlet {
 
     public void notifyOutlet() {
         synchronized (lock) {
-            notifyAll();
+            synchronized (this) {
+                notifyAll();
+            }
         }
+
     }
 
     public synchronized Boolean canFulfillOrder(Order order) {

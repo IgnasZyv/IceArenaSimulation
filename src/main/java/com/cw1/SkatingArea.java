@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class SkatingArea {
     private static SkatingArea instance = null;
-    private final Object lock = new Object();
+    private static final Object lock = new Object();
     private static final List<Visitor> skaters = new ArrayList<>();
     private SimulationFrame simulationFrame;
     private final Random random = new Random();
@@ -32,22 +32,24 @@ public class SkatingArea {
             }
             skaters.add(visitor);
             IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
-            List<Visitor> inQueue = App.getVisitors();
-            inQueue.removeAll(skaters);
-            QueuePanel.getInstance().updateQueue(inQueue);
+            QueuePanel.getInstance().removeVisitor(visitor);
+            StatisticsPanel.updateSkatingVisitors(skaters.size());
+
+//            List<Visitor> inQueue = App.getVisitors();
+//            inQueue.removeAll(skaters);
+//            QueuePanel.getInstance().updateQueue(inQueue);
         }
         try {
             System.out.println(visitor.getId() + " is skating");
             visitor.setSkating(true);
-            Thread.sleep(20000);
+            Thread.sleep(new Random().nextInt(8000, 15000));
             visitor.setSkating(false);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         synchronized (lock) {
-            getQueuePanel().addQueue(skaters);
-            skaters.remove(visitor);
-            IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
+//            skaters.remove(visitor);
+//            IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
             System.out.println(visitor.getId() + " has finished skating");
             lock.notifyAll();
         }
