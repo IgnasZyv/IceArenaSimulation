@@ -8,18 +8,18 @@ import java.util.concurrent.locks.ReentrantLock;
 public class OutletThread extends Thread {
     private static OutletThread instance;
     private final Outlet outlet;
-    private final IceArena iceArena = IceArena.getInstance();
+    private final IceRink iceRink = IceRink.getInstance();
     private LinkedBlockingQueue<Order> waitingOrders;
     public static final Lock lock = new ReentrantLock();
     private static final Condition storageUpdated = lock.newCondition();
 
-    private OutletThread(Outlet outlet) {
-        this.outlet = outlet;
+    private OutletThread() {
+        this.outlet = App.getOutlet();
     }
 
-    public static OutletThread getInstance(Outlet outlet) {
+    public static OutletThread getInstance() {
         if (instance == null) {
-            instance = new OutletThread(outlet);
+            instance = new OutletThread();
         }
         return instance;
     }
@@ -36,7 +36,7 @@ public class OutletThread extends Thread {
                 synchronized (outlet) { // synchronize on the outlet
                     try {
                         // if the order cannot be fulfilled, wait for the outlet to be notified that the storage has been updated
-                        if (!iceArena.completeOrder(order)) {
+                        if (!iceRink.completeOrder(order)) {
                             System.out.println("Can't fulfill order " + order.getOrderNumber() + ". Waiting for ice arena to complete an order");
                             outlet.wait();
                         }
@@ -57,9 +57,9 @@ public class OutletThread extends Thread {
             } else {
                 // if there are no orders that can be fulfilled, wait for the ice arena to complete an order
                 try {
-                    synchronized (iceArena) {
+                    synchronized (iceRink) {
                         System.out.println("No orders can be fulfilled. Waiting for ice arena to complete an order");
-                        iceArena.wait();
+                        iceRink.wait();
                     }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
@@ -70,8 +70,11 @@ public class OutletThread extends Thread {
     }
 
     private Order orderThatCanBeFulfilled() {
+        if (waitingOrders == null) {
+            return null;
+        }
         for (Order order : waitingOrders) {
-            if (iceArena.canFulfillOrder(order)) {
+            if (iceRink.canFulfillOrder(order)) {
                 return order;
             }
         }
@@ -87,7 +90,6 @@ public class OutletThread extends Thread {
 
         }
     }
-
 
 }
 

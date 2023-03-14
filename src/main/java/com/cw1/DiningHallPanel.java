@@ -38,7 +38,7 @@ public class DiningHallPanel extends JPanel {
         g.setColor(Color.BLACK);
         g.drawString("Dining Hall", xCenter - 100, yStart - 20);
 
-        IceArenaPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitorList);
+        IceRinkPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitorList);
     }
 
     public void addVisitor(Visitor visitor) {

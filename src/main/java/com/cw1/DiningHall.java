@@ -8,17 +8,17 @@ public class DiningHall {
     private final Object lock = new Object();
     private final Queue<Visitor> waitingVisitors;
     private final List<Visitor> visitors;
-    private final Semaphore semaphore;
+    private Semaphore semaphore;
 
-    private DiningHall(int capacity) {
+    private DiningHall() {
         this.visitors = new ArrayList<>();
         this.waitingVisitors = new LinkedList<>();
-        semaphore = new Semaphore(capacity);
+        semaphore = new Semaphore(App.getDiningHallCapacity());
     }
 
-    public static synchronized DiningHall getInstance(int capacity) {
+    public static synchronized DiningHall getInstance() {
         if (instance == null) {
-            instance = new DiningHall(capacity);
+            instance = new DiningHall();
         }
         return instance;
     }
@@ -75,4 +75,16 @@ public class DiningHall {
     public List<Visitor> getVisitors() {
         return visitors;
     }
+//
+//    public void updateSemaphore() {
+//        semaphore = new Semaphore(App.getDiningHallCapacity());
+//    }
+
+//    public void incrementSemaphore() {
+//        semaphore.release();
+//    }
+//
+//    public void decrementSemaphore() throws InterruptedException {
+//        semaphore.acquire();
+//    }
 }

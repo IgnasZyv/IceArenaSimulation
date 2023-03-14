@@ -6,11 +6,11 @@ import java.awt.*;
 public class SimulationFrame extends JPanel {
 
     private final QueuePanel queuePanel;
-    private final IceArenaPanel iceArenaPanel;
+    private final IceRinkPanel iceRinkPanel;
     private final DiningHallPanel diningHallPanel;
     private final StatisticsPanel statisticsPanel;
 
-    public SimulationFrame(IceArena iceArena) {
+    public SimulationFrame(IceRink iceRink) {
 //        this.simulationPanel = new SimulationPanel(visitors);
 
         setLayout(new GridLayout(0,5));
@@ -19,9 +19,9 @@ public class SimulationFrame extends JPanel {
 //        queuePanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
         add(queuePanel);
 
-        iceArenaPanel = IceArenaPanel.getInstance();
-//        iceArenaPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
-        add(iceArenaPanel);
+        iceRinkPanel = IceRinkPanel.getInstance();
+//        iceRinkPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
+        add(iceRinkPanel);
 
         DiningHallQueue diningHallQueue = DiningHallQueue.getInstance();
         add(diningHallQueue);
@@ -44,8 +44,8 @@ public class SimulationFrame extends JPanel {
         return queuePanel;
     }
 
-//    public IceArenaPanel getIceArenaPanel() {
-//        return iceArenaPanel;
+//    public IceRinkPanel getIceArenaPanel() {
+//        return iceRinkPanel;
 //    }
 
     public StatisticsPanel getStatisticsPanel() {

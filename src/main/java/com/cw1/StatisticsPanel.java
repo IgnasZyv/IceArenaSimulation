@@ -14,6 +14,12 @@ public class StatisticsPanel extends JPanel {
     private static JLabel helmetLabel;
     private static JLabel glovesLabel;
     private static JLabel penguinLabel;
+    private static JLabel numSkatesLabel;
+    private static JLabel numHelmetsLabel;
+    private static JLabel numGlovesLabel;
+    private static JLabel numPenguinLabel;
+    private static JLabel numVisitorsLabel;
+    private static JLabel capacityLabel;
 
     public StatisticsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -22,18 +28,18 @@ public class StatisticsPanel extends JPanel {
                 BorderFactory.createEmptyBorder(30, 0, 0, 0) // add Margin
         ));
 
-        IceArena iceArena = IceArena.getInstance();
+        IceRink iceRink = IceRink.getInstance();
 
-        skatesLabel = new JLabel("Skates: " + iceArena.getSkates().size());
+        skatesLabel = new JLabel("Skates: " + iceRink.getSkates().size());
         skatesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        helmetLabel = new JLabel("Helmets: " + iceArena.getHelmets().size());
+        helmetLabel = new JLabel("Helmets: " + iceRink.getHelmets().size());
         helmetLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        glovesLabel = new JLabel("Gloves: " + iceArena.getGloves().size());
+        glovesLabel = new JLabel("Gloves: " + iceRink.getGloves().size());
         glovesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        penguinLabel = new JLabel("Penguins: " + iceArena.getPenguins().size());
+        penguinLabel = new JLabel("Penguins: " + iceRink.getPenguins().size());
         penguinLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         waitingVisitorsLabel = new JLabel("Visitors waiting for items: " +
@@ -45,11 +51,11 @@ public class StatisticsPanel extends JPanel {
         skatingVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         waitingDiningVisitorsLabel = new JLabel("Visitors waiting for dining hall: "  +
-                DiningHall.getInstance(App.DINING_HALL_CAPACITY).getWaitingVisitorsCount());
+                DiningHall.getInstance().getWaitingVisitorsCount());
         waitingDiningVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         diningVisitorsLabel = new JLabel("Visitors in dining hall: " +
-                DiningHall.getInstance(App.DINING_HALL_CAPACITY).getVisitors().size());
+                DiningHall.getInstance().getVisitors().size());
         diningVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         add(skatesLabel);
@@ -61,7 +67,7 @@ public class StatisticsPanel extends JPanel {
         add(waitingDiningVisitorsLabel);
         add(diningVisitorsLabel);
 
-        // Add input fields for user input
+        //
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(0, 1, 10, 5));
         inputPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -69,49 +75,123 @@ public class StatisticsPanel extends JPanel {
                 BorderFactory.createEmptyBorder(10, 0, 10, 0)
         ));
 
-        JLabel numVisitorsLabel = new JLabel("Number of Visitors:");
-        JSpinner numVisitorsField = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        numVisitorsLabel = new JLabel("Number of Visitors: " + App.getVisitors().size());
+        JPanel visitorButtonPanel = new JPanel();
+        JButton addVisitorButton = new JButton("add");
+        addVisitorButton.addActionListener(e -> {
+            App.addVisitor();
+            updateNumVisitors();
+        });
+        visitorButtonPanel.add(addVisitorButton);
+
         JPanel visitorFieldPanel = new JPanel();
         visitorFieldPanel.setPreferredSize(new Dimension(1500, 40));
         visitorFieldPanel.add(numVisitorsLabel);
-        visitorFieldPanel.add(numVisitorsField);
+        visitorFieldPanel.add(visitorButtonPanel);
 
-        JLabel capacityLabel = new JLabel("Capacity of Dining Hall:");
-        JSpinner capacityField = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        capacityLabel = new JLabel("Dining Hall Capacity: " + App.getDiningHallCapacity());
+        JPanel capacityButtonPanel = new JPanel();
+        JButton addCapacityButton = new JButton("increase");
+        addCapacityButton.addActionListener(e -> {
+            App.increaseDiningHallCapacity();
+            updateCapacity();
+//            DiningHall.getInstance().incrementSemaphore();
+//            DiningHall.getInstance().updateSemaphore();
+        });
+        JButton removeCapacityButton = new JButton("lower");
+        removeCapacityButton.addActionListener(e -> {
+            App.decreaseDiningHallCapacity();
+            updateCapacity();
+
+//                DiningHall.getInstance().decrementSemaphore();
+//                DiningHall.getInstance().updateSemaphore();
+
+        });
+        capacityButtonPanel.add(addCapacityButton);
+        capacityButtonPanel.add(removeCapacityButton);
+
         JPanel capacityFieldPanel = new JPanel();
         capacityFieldPanel.setPreferredSize(new Dimension(1500, 40));
         capacityFieldPanel.add(capacityLabel);
-        capacityFieldPanel.add(capacityField);
+        capacityFieldPanel.add(capacityButtonPanel);
 
         JSeparator separator = new JSeparator();
 
-        JLabel numSkatesLabel = new JLabel("Number of Skates:");
-        JSpinner skatesField = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        numSkatesLabel = new JLabel("Number of Skates: " + iceRink.getSkates().size());
+
+        JPanel skatesButtonPanel = new JPanel();
+        JButton addSkatesButton = new JButton("add");
+        addSkatesButton.addActionListener(e -> {
+            IceRink.getInstance().addSkate();
+        });
+        JButton removeSkatesButton = new JButton("remove");
+        removeSkatesButton.addActionListener(e -> {
+            IceRink.getInstance().removeSkate();
+        });
+        skatesButtonPanel.add(addSkatesButton);
+        skatesButtonPanel.add(removeSkatesButton);
+
         JPanel skatesFieldPanel = new JPanel();
         skatesFieldPanel.setPreferredSize(new Dimension(1500, 40));
         skatesFieldPanel.add(numSkatesLabel);
-        skatesFieldPanel.add(skatesField);
+        skatesFieldPanel.add(skatesButtonPanel);
 
-        JLabel numHelmetsLabel = new JLabel("Number of Helmets:");
-        JSpinner helmetsField = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        numHelmetsLabel = new JLabel("Number of Helmets: " + iceRink.getHelmets().size());
+
+        JPanel helmetsButtonPanel = new JPanel();
+        JButton addHelmetsButton = new JButton("add");
+        addHelmetsButton.addActionListener(e -> {
+            IceRink.getInstance().addHelmet();
+        });
+        JButton removeHelmetsButton = new JButton("remove");
+        removeHelmetsButton.addActionListener(e -> {
+            IceRink.getInstance().removeHelmet();
+        });
+        helmetsButtonPanel.add(addHelmetsButton);
+        helmetsButtonPanel.add(removeHelmetsButton);
+
         JPanel helmetsFieldPanel = new JPanel();
         helmetsFieldPanel.setPreferredSize(new Dimension(1500, 40));
         helmetsFieldPanel.add(numHelmetsLabel);
-        helmetsFieldPanel.add(helmetsField);
+        helmetsFieldPanel.add(helmetsButtonPanel);
 
-        JLabel numGlovesLabel = new JLabel("Number of Gloves:");
-        JSpinner glovesField = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        numGlovesLabel = new JLabel("Number of Gloves: " + iceRink.getGloves().size());
+
+        JPanel glovesButtonPanel = new JPanel();
+        JButton addGlovesButton = new JButton("add");
+        addGlovesButton.addActionListener(e -> {
+            IceRink.getInstance().addGlove();
+        });
+        JButton removeGlovesButton = new JButton("remove");
+        removeGlovesButton.addActionListener(e -> {
+            IceRink.getInstance().removeGlove();
+        });
+        glovesButtonPanel.add(addGlovesButton);
+        glovesButtonPanel.add(removeGlovesButton);
+
         JPanel glovesFieldPanel = new JPanel();
         glovesFieldPanel.setPreferredSize(new Dimension(1500, 40));
         glovesFieldPanel.add(numGlovesLabel);
-        glovesFieldPanel.add(glovesField);
+        glovesFieldPanel.add(glovesButtonPanel);
 
-        JLabel numPenguinLabel = new JLabel("Number of Penguins:");
-        JSpinner penguinField = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        numPenguinLabel = new JLabel("Number of Penguins: " + iceRink.getPenguins().size());
+
+        JPanel penguinButtonPanel = new JPanel();
+        JButton addPenguinButton = new JButton("add");
+        addPenguinButton.addActionListener(e -> {
+            IceRink.getInstance().addPenguin();
+        });
+        JButton removePenguinButton = new JButton("remove");
+        removePenguinButton.addActionListener(e -> {
+            IceRink.getInstance().removePenguin();
+        });
+        penguinButtonPanel.add(addPenguinButton);
+        penguinButtonPanel.add(removePenguinButton);
+
         JPanel penguinFieldPanel = new JPanel();
         penguinFieldPanel.setPreferredSize(new Dimension(1500, 40));
         penguinFieldPanel.add(numPenguinLabel);
-        penguinFieldPanel.add(penguinField);
+        penguinFieldPanel.add(penguinButtonPanel);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setPreferredSize(new Dimension(20, 10));
@@ -156,5 +236,30 @@ public class StatisticsPanel extends JPanel {
     public static void updateDiningVisitors(int diningVisitors) {
         diningVisitorsLabel.setText("Visitors in dining hall: " + diningVisitors);
     }
+
+    public static void updateNumVisitors() {
+        numVisitorsLabel.setText("Number of Visitors: " + App.getVisitors().size());
+    }
+
+    public static void updateCapacity() {
+        capacityLabel.setText("Dining Hall Capacity: " + App.getDiningHallCapacity());
+    }
+
+    public static void updateNumSkates() {
+        numSkatesLabel.setText("Number of Skates: " + IceRink.getInstance().getSkates().size());
+    }
+
+    public static void updateNumHelmets() {
+        numHelmetsLabel.setText("Number of Helmets: " + IceRink.getInstance().getHelmets().size());
+    }
+
+    public static void updateNumGloves() {
+        numGlovesLabel.setText("Number of Gloves: " + IceRink.getInstance().getGloves().size());
+    }
+
+    public static void updateNumPenguins() {
+        numPenguinLabel.setText("Number of Penguins: " + IceRink.getInstance().getPenguins().size());
+    }
+
 
 }

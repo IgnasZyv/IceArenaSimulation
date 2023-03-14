@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 public class Outlet {
-    private final IceArena iceArena;
+    private final IceRink iceRink;
     private final Object lock = new Object();
     private final Outlet outlet = this;
     private final Semaphore semaphore = new Semaphore(1);
@@ -16,14 +16,11 @@ public class Outlet {
 
     private final LinkedBlockingQueue<Order> waitingQueue;
 
-    public Outlet(IceArena iceArena) {
-        this.iceArena = iceArena;
+    public Outlet(IceRink iceRink) {
+        this.iceRink = iceRink;
         LinkedList<Visitor> visitorQueue = new LinkedList<>();
-        //private Queue<Order> visitorQueue = new LinkedList<>();
         LinkedBlockingQueue<Order> returnQueue = new LinkedBlockingQueue<>();
         this.waitingQueue = new LinkedBlockingQueue<>();
-        OutletThread outletThread = OutletThread.getInstance(outlet);
-        outletThread.start();
     }
 
     public synchronized void placeOrder(Order order) throws InterruptedException {
@@ -33,7 +30,7 @@ public class Outlet {
         if (!waitingQueue.contains(order)) {
             if (canFulfillOrder(order)) {
                 System.out.println("Placing order: " + order.toString());
-                iceArena.completeOrder(order);
+                iceRink.completeOrder(order);
                 orderPlaced = true;
             }
 
@@ -66,8 +63,8 @@ public class Outlet {
         System.out.println("outlet: Items for return: " + returnOrder.getItemList() + " from visitor: " + returnOrder.getVisitor().getId());
         returnOrder.getVisitor().setInQueue(true);
         returnOrder.setStatus(OrderStatus.Returning);
-        IceArenaPanel.getInstance().redraw();
-        if (iceArena.returnItems(returnOrder)) {
+        IceRinkPanel.getInstance().redraw();
+        if (iceRink.returnItems(returnOrder)) {
             System.out.println("outlet: Items returned to ice arena");
             return true;
         }
@@ -84,7 +81,7 @@ public class Outlet {
     }
 
     public synchronized Boolean canFulfillOrder(Order order) {
-        return iceArena.canFulfillOrder(order);
+        return iceRink.canFulfillOrder(order);
     }
 
     public LinkedBlockingQueue<Order> getWaitingQueue() {

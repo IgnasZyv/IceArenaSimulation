@@ -31,7 +31,7 @@ public class SkatingArea {
                 }
             }
             skaters.add(visitor);
-            IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
+            IceRinkPanel.getInstance().updateSkatingVisitors(skaters);
             QueuePanel.getInstance().removeVisitor(visitor);
             StatisticsPanel.updateSkatingVisitors(skaters.size());
 
@@ -49,7 +49,7 @@ public class SkatingArea {
         }
         synchronized (lock) {
 //            skaters.remove(visitor);
-//            IceArenaPanel.getInstance().updateSkatingVisitors(skaters);
+//            IceRinkPanel.getInstance().updateSkatingVisitors(skaters);
             System.out.println(visitor.getId() + " has finished skating");
             lock.notifyAll();
         }
@@ -65,14 +65,4 @@ public class SkatingArea {
         return skaters;
     }
 
-    public void setSimulationFrame(SimulationFrame simulationFrame) {
-        this.simulationFrame = simulationFrame;
-    }
-
-    public QueuePanel getQueuePanel() {
-        if (simulationFrame == null) {
-            return App.getSimulationFrame().getQueuePanel();
-        }
-        return simulationFrame.getQueuePanel();
-    }
 }

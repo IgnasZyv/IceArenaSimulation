@@ -5,12 +5,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IceArenaPanel extends JPanel {
-    private static IceArenaPanel instance = null;
+public class IceRinkPanel extends JPanel {
+    private static IceRinkPanel instance = null;
     private List<Visitor> visitors;
     private List<Visitor> skatingVisitors;
 
-    private IceArenaPanel() {
+    private IceRinkPanel() {
         this.skatingVisitors = new ArrayList<>();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createCompoundBorder(
@@ -20,9 +20,9 @@ public class IceArenaPanel extends JPanel {
 
     }
 
-    public static synchronized IceArenaPanel getInstance() {
+    public static synchronized IceRinkPanel getInstance() {
         if (instance == null) {
-            instance = new IceArenaPanel();
+            instance = new IceRinkPanel();
         }
         return instance;
     }

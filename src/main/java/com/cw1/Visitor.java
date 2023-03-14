@@ -7,9 +7,9 @@ import java.util.Random;
 public class Visitor implements Runnable {
     private static final Object lock = new Object();
     private String id;
-    private final IceArena iceArena = IceArena.getInstance();
+    private final IceRink iceRink = IceRink.getInstance();
     private final SkatingArea skatingArea = SkatingArea.getInstance();
-    private final DiningHall diningHall = DiningHall.getInstance(App.DINING_HALL_CAPACITY);
+    private final DiningHall diningHall = DiningHall.getInstance();
     private final Outlet outlet = App.getOutlet();
     private List<Item> borrowedItems;
     private List<Order> orders;
@@ -17,6 +17,7 @@ public class Visitor implements Runnable {
 
     private Boolean isSkating = false;
     private Boolean inQueue = false;
+    private Boolean running = true;
 
 
     public Visitor(String id) {
@@ -28,7 +29,7 @@ public class Visitor implements Runnable {
 
         @Override
         public void run() {
-            while (true) {
+            while (running) {
                 if (!borrowedItems.isEmpty()) {
                     borrowedItems = new ArrayList<>();
                 }
@@ -71,6 +72,7 @@ public class Visitor implements Runnable {
                     }
                     System.out.println(id + " has finished eating");
                 }
+
             }
         }
 
@@ -117,12 +119,12 @@ public class Visitor implements Runnable {
         this.id = id;
     }
 
-    public IceArena getIceArena() {
-        return iceArena;
+    public IceRink getIceArena() {
+        return iceRink;
     }
 
-    public void setIceArena(IceArena iceArena) {
-        iceArena = iceArena;
+    public void setIceArena(IceRink iceRink) {
+        iceRink = iceRink;
     }
 
     public SkatingArea getSkatingArea() {
@@ -189,6 +191,5 @@ public class Visitor implements Runnable {
     public String toString() {
         return id;
     }
-
 
 }

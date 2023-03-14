@@ -36,7 +36,7 @@ public class QueuePanel extends JPanel {
         g.setColor(Color.BLACK);
         g.drawString("Queue", xCenter - 100, yStart - 20);
 
-        IceArenaPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitors);
+        IceRinkPanel.getInstance().drawVisitors(g, xCenter, yStart, yStep, visitors);
     }
 
     public void addQueue(Visitor visitor) {

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class IceArena {
-    private static IceArena instance = null;
+public class IceRink {
+    private static IceRink instance = null;
     private final Object lock = new Object();
     private Visitor visitor;
     AtomicReference<ArrayList<Item>> skates = new AtomicReference<>(new ArrayList<>());
@@ -15,21 +15,28 @@ public class IceArena {
     AtomicReference<ArrayList<Item>> gloves = new AtomicReference<>(new ArrayList<>());
     AtomicReference<ArrayList<Item>> penguins = new AtomicReference<>(new ArrayList<>());
 
-    private IceArena() {
+    private IceRink() {
 
         List<List<Item>> borrowedItems = new ArrayList<>();
         int maxItems = 5; // set max items
 
         ArrayList<Item> skateItems = new ArrayList<>();
-        ArrayList<Item> helmetItems = new ArrayList<>();
-        ArrayList<Item> gloveItems = new ArrayList<>();
-        ArrayList<Item> penguinItems = new ArrayList<>();
-        for (int i = 0; i < maxItems; i++) {
+        for (int i = 0; i < App.SKATES_NUM; i++) {
             skateItems.add(new Item(ItemType.SKATES));
-            helmetItems.add(new Item(ItemType.HELMET));
-            gloveItems.add(new Item(ItemType.GLOVES));
-            penguinItems.add(new Item(ItemType.PENGUIN));
         }
+        ArrayList<Item> helmetItems = new ArrayList<>();
+        for (int i = 0; i < App.HELMETS_NUM; i++) {
+            helmetItems.add(new Item(ItemType.SKATES));
+        }
+        ArrayList<Item> gloveItems = new ArrayList<>();
+        for (int i = 0; i < App.GLOVES_NUM; i++) {
+            gloveItems.add(new Item(ItemType.SKATES));
+        }
+        ArrayList<Item> penguinItems = new ArrayList<>();
+        for (int i = 0; i < App.PENGUINS_NUM; i++) {
+            penguinItems.add(new Item(ItemType.SKATES));
+        }
+
         skates.set(skateItems);
         helmets.set(helmetItems);
         gloves.set(gloveItems);
@@ -37,9 +44,9 @@ public class IceArena {
 
     }
 
-    public static synchronized IceArena getInstance() {
+    public static synchronized IceRink getInstance() {
         if (instance == null) {
-            instance = new IceArena();
+            instance = new IceRink();
         }
         return instance;
     }
@@ -64,11 +71,11 @@ public class IceArena {
                         penguins.get().add(item);
                         itemTypes.add(item.getType());
                     }
-                    default -> System.out.println("IceArena: addItems: " + "failed to add " + item);
+                    default -> System.out.println("IceRink: addItems: " + "failed to add " + item);
                 }
             }
             StatisticsPanel.updateItems(getInventory()); // update inventory gui
-            System.out.println("IceArena: Added to storage" + itemTypes);
+            System.out.println("IceRink: Added to storage" + itemTypes);
             System.out.println(getInventoryString());
             order.getVisitor().getBorrowedItems().clear(); // clear visitors borrowed items
             order.getVisitor().setInQueue(false); // remove visitor from queue
@@ -76,7 +83,7 @@ public class IceArena {
 
             SkatingArea.getSkaters().remove(order.getVisitor()); // remove visitor from skating area gui
             StatisticsPanel.updateSkatingVisitors(SkatingArea.getSkaters().size()); // update the statistics panel for skating visitor count
-            IceArenaPanel.getInstance().updateSkatingVisitors(SkatingArea.getSkaters()); // update skating area gui
+            IceRinkPanel.getInstance().updateSkatingVisitors(SkatingArea.getSkaters()); // update skating area gui
 
             order.getVisitor().addOrder(order); // add order to the list of visitors orders
             order.getVisitor().setOrder(null); // set the current order to null so the visitor can borrow again
@@ -86,7 +93,7 @@ public class IceArena {
             }
 
             // notify the outlet that the storage has been updated
-            OutletThread.getInstance(App.getOutlet()).notifyStorageUpdated();
+            OutletThread.getInstance().notifyStorageUpdated();
 
         Thread.sleep(new Random().nextInt(1000, 2000));
         return true;
@@ -207,6 +214,62 @@ public class IceArena {
                 ", Helmets: " + helmets.get().size() +
                 ", Gloves: " + gloves.get().size() +
                 ", Penguins: " + penguins.get().size();
+    }
+
+    public synchronized void addSkate() {
+        skates.get().add(new Item(ItemType.SKATES));
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumSkates(); // update statistics panel for number of skates
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void removeSkate() {
+        skates.get().remove(0);
+        StatisticsPanel.updateItems(getInventory());
+        StatisticsPanel.updateNumSkates();
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void addHelmet() {
+        helmets.get().add(new Item(ItemType.HELMET));
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumHelmets();
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void removeHelmet() {
+        helmets.get().remove(0);
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumHelmets();
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void addGlove() {
+        gloves.get().add(new Item(ItemType.GLOVES));
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumGloves();
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void removeGlove() {
+        gloves.get().remove(0);
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumGloves();
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void addPenguin() {
+        penguins.get().add(new Item(ItemType.PENGUIN));
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumPenguins();
+        OutletThread.getInstance().notifyStorageUpdated();
+    }
+
+    public synchronized void removePenguin() {
+        penguins.get().remove(0);
+        StatisticsPanel.updateItems(getInventory()); // update inventory gui
+        StatisticsPanel.updateNumPenguins();
+        OutletThread.getInstance().notifyStorageUpdated();
     }
 
 }
