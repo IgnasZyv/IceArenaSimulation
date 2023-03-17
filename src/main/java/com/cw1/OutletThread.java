@@ -1,17 +1,14 @@
 package com.cw1;
 
+import com.cw1.enums.OrderStatus;
+
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class OutletThread extends Thread {
     private static OutletThread instance;
     private final Outlet outlet;
     private final IceRink iceRink = IceRink.getInstance();
     private LinkedBlockingQueue<Order> waitingOrders;
-    public static final Lock lock = new ReentrantLock();
-    private static final Condition storageUpdated = lock.newCondition();
 
     private OutletThread() {
         this.outlet = App.getOutlet();
@@ -57,9 +54,9 @@ public class OutletThread extends Thread {
             } else {
                 // if there are no orders that can be fulfilled, wait for the ice arena to complete an order
                 try {
-                    synchronized (iceRink) {
+                    synchronized (outlet) {
                         System.out.println("No orders can be fulfilled. Waiting for ice arena to complete an order");
-                        iceRink.wait();
+                        outlet.wait();
                     }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
@@ -73,6 +70,7 @@ public class OutletThread extends Thread {
         if (waitingOrders == null) {
             return null;
         }
+        // find an order that can be fulfilled
         for (Order order : waitingOrders) {
             if (iceRink.canFulfillOrder(order)) {
                 return order;

@@ -1,8 +1,11 @@
 package com.cw1;
 
+import com.cw1.enums.SimSpeed;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class App {
@@ -12,6 +15,8 @@ public class App {
     public static int HELMETS_NUM = 0;
     public static int GLOVES_NUM = 0;
     public static int PENGUINS_NUM = 0;
+    public static SimSpeed processingSpeed = SimSpeed.FAST;
+    public static SimSpeed skatingDiningSpeed = SimSpeed.FAST;
     private static List<Visitor> visitors;
     private static Outlet outlet;
     private static SimulationFrame simulationFrame;
@@ -20,17 +25,6 @@ public class App {
     public static void main(String[] args) {
         // Create and display the setup dialog
         setupDialog.setVisible(true);
-
-        // Wait until the user has closed the setup dialog
-        while (setupDialog.isVisible()) {
-            try {
-                synchronized (setupDialog) {
-                    setupDialog.wait();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
         // Retrieve the selected parameters and start the simulation
         NUMBER_OF_VISITORS = setupDialog.getNumVisitors();
@@ -58,13 +52,12 @@ public class App {
 
         }
 
-        simulationFrame = new SimulationFrame(iceRink);
+        simulationFrame = new SimulationFrame(iceRink); // start the simulation frame
 
-
+        // start the visitors
         for (Visitor visitor : visitors) {
             new Thread(visitor).start();
         }
-
 
         JFrame frame = new JFrame("Skating Frame");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,10 +74,6 @@ public class App {
         return outlet;
     }
 
-    public static SimulationFrame getSimulationFrame() {
-        return simulationFrame;
-    }
-
     public static int getDiningHallCapacity() {
         return DINING_HALL_CAPACITY;
     }
@@ -92,16 +81,38 @@ public class App {
     public static void addVisitor() {
         Visitor visitor = new Visitor("Visitor " + visitors.size());
         visitors.add(visitor);
-        new Thread(visitor).start();
+        new Thread(visitor).start(); // add and start a new visitor
     }
 
-    public static void increaseDiningHallCapacity() {
-        DINING_HALL_CAPACITY++;
+    public static SimSpeed getProcessingSpeed() {
+        return processingSpeed;
     }
 
-    public static void decreaseDiningHallCapacity() {
-        if (DINING_HALL_CAPACITY > 0) {
-            DINING_HALL_CAPACITY--;
+    public static void setProcessingSpeed(SimSpeed processingSpeed) {
+        App.processingSpeed = processingSpeed;
+    }
+
+    public static void setSkatingDiningSpeed(SimSpeed skatingDiningSpeed) {
+        App.skatingDiningSpeed = skatingDiningSpeed;
+    }
+
+    public static int processingSleep() { // the time it takes to process an order
+        if (processingSpeed == SimSpeed.SLOW) {
+            return new Random().nextInt(3000, 5000);
+        } else if (processingSpeed == SimSpeed.MEDIUM) {
+            return new Random().nextInt(2000, 3000);
+        } else {
+            return new Random().nextInt(500, 1500);
+        }
+    }
+
+    public static int skatingDiningSleep() { // the time it takes to skate or dine
+        if (skatingDiningSpeed == SimSpeed.SLOW) {
+            return new Random().nextInt(15000, 20000);
+        } else if (skatingDiningSpeed == SimSpeed.MEDIUM) {
+            return new Random().nextInt(10000, 15000);
+        } else {
+            return new Random().nextInt(5000, 8000);
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.cw1;
 
+import com.cw1.enums.ItemType;
+
 public class Item {
     private String name;
     private boolean available;

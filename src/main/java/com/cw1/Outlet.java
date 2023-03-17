@@ -2,17 +2,11 @@ package com.cw1;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 
 public class Outlet {
     private final IceRink iceRink;
-    private final Object lock = new Object();
     private final Outlet outlet = this;
-    private final Semaphore semaphore = new Semaphore(1);
-    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     private final LinkedBlockingQueue<Order> waitingQueue;
 
@@ -23,9 +17,7 @@ public class Outlet {
         this.waitingQueue = new LinkedBlockingQueue<>();
     }
 
-    public synchronized void placeOrder(Order order) throws InterruptedException {
-//        order.getVisitor().setInQueue(true);
-
+    public void placeOrder(Order order) throws InterruptedException {
         boolean orderPlaced = false;
         if (!waitingQueue.contains(order)) {
             if (canFulfillOrder(order)) {
@@ -35,17 +27,29 @@ public class Outlet {
             }
 
             if (!orderPlaced) {
+                // 10% chance for not waiting in queue and just leaving
+                if (Math.random() < 0.1) {
+                    System.out.println(order.getVisitor() + ": Not waiting in queue, leaving");
+                    QueuePanel.getInstance().removeVisitor(order.getVisitor());
+                    return;
+                }
                 System.out.println(order.getVisitor() + ": Cannot place order, waiting for items to be returned");
-                order.getVisitor().setInQueue(true);
-                waitingQueue.put(order);
+                order.getVisitor().setInQueue(true); // set the visitor in queue
+                waitingQueue.put(order); // add the order to the waiting queue
                 HashMap<String, String> map = new HashMap<>();
+                // print out all the orders in the queue
                 for (Order ord : waitingQueue) {
                     map.put(ord.getVisitor().getId(), "#" + String.valueOf(ord.getOrderNumber()));
                 }
                 System.out.println("Waiting queue: " + map);
-                while (waitingQueue.contains(order)) {
-                    wait();
+
+                synchronized (outlet) {
+                    // while the order is still in the queue, wait for the outlet to notify
+                    while (waitingQueue.contains(order)) {
+                        outlet.wait();
+                    }
                 }
+
             }
         } else {
             if (order.getItemList() == null) {
@@ -59,25 +63,10 @@ public class Outlet {
 
     }
 
-    public synchronized boolean returnItems(Order returnOrder) throws InterruptedException {
-        System.out.println("outlet: Items for return: " + returnOrder.getItemList() + " from visitor: " + returnOrder.getVisitor().getId());
-        returnOrder.getVisitor().setInQueue(true);
-        returnOrder.setStatus(OrderStatus.Returning);
-        IceRinkPanel.getInstance().redraw();
-        if (iceRink.returnItems(returnOrder)) {
-            System.out.println("outlet: Items returned to ice arena");
-            return true;
-        }
-        return false;
-    }
-
     public void notifyOutlet() {
-        synchronized (lock) {
-            synchronized (this) {
-                notifyAll();
-            }
+        synchronized (this) {
+            notifyAll();
         }
-
     }
 
     public synchronized Boolean canFulfillOrder(Order order) {

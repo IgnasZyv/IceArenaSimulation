@@ -1,4 +1,4 @@
-package com.cw1;
+package com.cw1.enums;
 
 import java.util.ArrayList;
 import java.util.Arrays;

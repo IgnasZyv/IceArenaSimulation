@@ -1,5 +1,8 @@
 package com.cw1;
 
+import com.cw1.enums.ItemType;
+import com.cw1.enums.SimSpeed;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -14,60 +17,62 @@ public class StatisticsPanel extends JPanel {
     private static JLabel helmetLabel;
     private static JLabel glovesLabel;
     private static JLabel penguinLabel;
-    private static JLabel numSkatesLabel;
-    private static JLabel numHelmetsLabel;
-    private static JLabel numGlovesLabel;
-    private static JLabel numPenguinLabel;
     private static JLabel numVisitorsLabel;
     private static JLabel capacityLabel;
 
     public StatisticsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Statistics"),
-                BorderFactory.createEmptyBorder(30, 0, 0, 0) // add Margin
+                BorderFactory.createEmptyBorder(10, 0, 0, 0) // add Margin
         ));
 
         IceRink iceRink = IceRink.getInstance();
 
         skatesLabel = new JLabel("Skates: " + iceRink.getSkates().size());
-        skatesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         helmetLabel = new JLabel("Helmets: " + iceRink.getHelmets().size());
-        helmetLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         glovesLabel = new JLabel("Gloves: " + iceRink.getGloves().size());
-        glovesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         penguinLabel = new JLabel("Penguins: " + iceRink.getPenguins().size());
-        penguinLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         waitingVisitorsLabel = new JLabel("Visitors waiting for items: " +
                 QueuePanel.getInstance().getVisitors().size());
-        waitingVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         skatingVisitorsLabel = new JLabel("Skating visitors: " +
                 SkatingArea.getSkaters().size());
-        skatingVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        waitingDiningVisitorsLabel = new JLabel("Visitors waiting for dining hall: "  +
+        waitingDiningVisitorsLabel = new JLabel("Waiting for dining hall: " +
                 DiningHall.getInstance().getWaitingVisitorsCount());
-        waitingDiningVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         diningVisitorsLabel = new JLabel("Visitors in dining hall: " +
                 DiningHall.getInstance().getVisitors().size());
-        diningVisitorsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        add(skatesLabel);
-        add(helmetLabel);
-        add(glovesLabel);
-        add(penguinLabel);
-        add(skatingVisitorsLabel);
-        add(waitingVisitorsLabel);
-        add(waitingDiningVisitorsLabel);
-        add(diningVisitorsLabel);
 
-        //
+        JPanel stockPanel = new JPanel();
+        stockPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+
+        stockPanel.add(skatesLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(helmetLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(glovesLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(penguinLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(skatingVisitorsLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(waitingVisitorsLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(waitingDiningVisitorsLabel);
+        stockPanel.add(Box.createVerticalStrut(10));
+        stockPanel.add(diningVisitorsLabel);
+
+        add(stockPanel);
+
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(0, 1, 10, 5));
         inputPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -89,35 +94,9 @@ public class StatisticsPanel extends JPanel {
         visitorFieldPanel.add(numVisitorsLabel);
         visitorFieldPanel.add(visitorButtonPanel);
 
-        capacityLabel = new JLabel("Dining Hall Capacity: " + App.getDiningHallCapacity());
-        JPanel capacityButtonPanel = new JPanel();
-        JButton addCapacityButton = new JButton("increase");
-        addCapacityButton.addActionListener(e -> {
-            App.increaseDiningHallCapacity();
-            updateCapacity();
-//            DiningHall.getInstance().incrementSemaphore();
-//            DiningHall.getInstance().updateSemaphore();
-        });
-        JButton removeCapacityButton = new JButton("lower");
-        removeCapacityButton.addActionListener(e -> {
-            App.decreaseDiningHallCapacity();
-            updateCapacity();
-
-//                DiningHall.getInstance().decrementSemaphore();
-//                DiningHall.getInstance().updateSemaphore();
-
-        });
-        capacityButtonPanel.add(addCapacityButton);
-        capacityButtonPanel.add(removeCapacityButton);
-
-        JPanel capacityFieldPanel = new JPanel();
-        capacityFieldPanel.setPreferredSize(new Dimension(1500, 40));
-        capacityFieldPanel.add(capacityLabel);
-        capacityFieldPanel.add(capacityButtonPanel);
-
         JSeparator separator = new JSeparator();
 
-        numSkatesLabel = new JLabel("Number of Skates: " + iceRink.getSkates().size());
+        JLabel numSkatesLabel = new JLabel("Number of Skates");
 
         JPanel skatesButtonPanel = new JPanel();
         JButton addSkatesButton = new JButton("add");
@@ -136,7 +115,7 @@ public class StatisticsPanel extends JPanel {
         skatesFieldPanel.add(numSkatesLabel);
         skatesFieldPanel.add(skatesButtonPanel);
 
-        numHelmetsLabel = new JLabel("Number of Helmets: " + iceRink.getHelmets().size());
+        JLabel numHelmetsLabel = new JLabel("Number of Helmets");
 
         JPanel helmetsButtonPanel = new JPanel();
         JButton addHelmetsButton = new JButton("add");
@@ -155,7 +134,7 @@ public class StatisticsPanel extends JPanel {
         helmetsFieldPanel.add(numHelmetsLabel);
         helmetsFieldPanel.add(helmetsButtonPanel);
 
-        numGlovesLabel = new JLabel("Number of Gloves: " + iceRink.getGloves().size());
+        JLabel numGlovesLabel = new JLabel("Number of Gloves");
 
         JPanel glovesButtonPanel = new JPanel();
         JButton addGlovesButton = new JButton("add");
@@ -174,7 +153,7 @@ public class StatisticsPanel extends JPanel {
         glovesFieldPanel.add(numGlovesLabel);
         glovesFieldPanel.add(glovesButtonPanel);
 
-        numPenguinLabel = new JLabel("Number of Penguins: " + iceRink.getPenguins().size());
+        JLabel numPenguinLabel = new JLabel("Number of Penguins");
 
         JPanel penguinButtonPanel = new JPanel();
         JButton addPenguinButton = new JButton("add");
@@ -193,14 +172,7 @@ public class StatisticsPanel extends JPanel {
         penguinFieldPanel.add(numPenguinLabel);
         penguinFieldPanel.add(penguinButtonPanel);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setPreferredSize(new Dimension(20, 10));
-        JButton startButton = new JButton("Start");
-        buttonPanel.add(startButton);
-
-
         inputPanel.add(visitorFieldPanel);
-        inputPanel.add(capacityFieldPanel);
 
         inputPanel.add(separator);
 
@@ -208,9 +180,65 @@ public class StatisticsPanel extends JPanel {
         inputPanel.add(helmetsFieldPanel);
         inputPanel.add(glovesFieldPanel);
         inputPanel.add(penguinFieldPanel);
-        inputPanel.add(buttonPanel);
+
+        JPanel notifyPanel = new JPanel();
+        notifyPanel.setPreferredSize(new Dimension(10, 10));
+        JButton notifyButton = new JButton("Notify");
+        notifyButton.addActionListener(e -> {
+            App.getOutlet().notifyOutlet();
+        });
+        notifyPanel.add(notifyButton);
+
+        inputPanel.add(notifyPanel);
+
+        JPanel speedLabelPanel = new JPanel();
+//        speedLabelPanel.setPreferredSize(new Dimension(1500, 40));
+        JLabel speedLabel = new JLabel("Simulation Speed: " + App.getProcessingSpeed());
+        speedLabelPanel.add(speedLabel);
+
+        JPanel speedPanel = new JPanel();
+        speedPanel.setLayout(new GridLayout(0, 3));
+        speedPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Speed"),
+                BorderFactory.createEmptyBorder(0, 0, 0, 0)
+        ));
+
+        JPanel slowButtonPanel = new JPanel();
+        slowButtonPanel.setPreferredSize(new Dimension(10, 10));
+        JButton slowButton = new JButton("Slow");
+        slowButton.addActionListener(e -> {
+            App.setProcessingSpeed(SimSpeed.SLOW);
+            App.setSkatingDiningSpeed(SimSpeed.SLOW);
+            speedLabel.setText("Simulation Speed: " + App.getProcessingSpeed());
+        });
+        slowButtonPanel.add(slowButton);
+        speedPanel.add(slowButtonPanel);
+
+        JPanel normalButtonPanel = new JPanel();
+        normalButtonPanel.setPreferredSize(new Dimension(10, 10));
+        JButton normalButton = new JButton("Normal");
+        normalButton.addActionListener(e -> {
+            App.setProcessingSpeed(SimSpeed.MEDIUM);
+            App.setSkatingDiningSpeed(SimSpeed.MEDIUM);
+            speedLabel.setText("Simulation Speed: " + App.getProcessingSpeed());
+        });
+        normalButtonPanel.add(normalButton);
+        speedPanel.add(normalButtonPanel);
+
+        JPanel fastButtonPanel = new JPanel();
+        fastButtonPanel.setPreferredSize(new Dimension(10, 10));
+        JButton fastButton = new JButton("Fast");
+        fastButton.addActionListener(e -> {
+            App.setProcessingSpeed(SimSpeed.FAST);
+            App.setSkatingDiningSpeed(SimSpeed.FAST);
+            speedLabel.setText("Simulation Speed: " + App.getProcessingSpeed());
+        });
+        fastButtonPanel.add(fastButton);
+        speedPanel.add(fastButtonPanel);
 
         add(inputPanel);
+        add(speedLabelPanel);
+        add(speedPanel);
 
     }
 
@@ -240,26 +268,5 @@ public class StatisticsPanel extends JPanel {
     public static void updateNumVisitors() {
         numVisitorsLabel.setText("Number of Visitors: " + App.getVisitors().size());
     }
-
-    public static void updateCapacity() {
-        capacityLabel.setText("Dining Hall Capacity: " + App.getDiningHallCapacity());
-    }
-
-    public static void updateNumSkates() {
-        numSkatesLabel.setText("Number of Skates: " + IceRink.getInstance().getSkates().size());
-    }
-
-    public static void updateNumHelmets() {
-        numHelmetsLabel.setText("Number of Helmets: " + IceRink.getInstance().getHelmets().size());
-    }
-
-    public static void updateNumGloves() {
-        numGlovesLabel.setText("Number of Gloves: " + IceRink.getInstance().getGloves().size());
-    }
-
-    public static void updateNumPenguins() {
-        numPenguinLabel.setText("Number of Penguins: " + IceRink.getInstance().getPenguins().size());
-    }
-
 
 }

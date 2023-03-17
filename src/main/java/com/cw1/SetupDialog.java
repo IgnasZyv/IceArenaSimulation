@@ -7,15 +7,14 @@ import java.awt.event.ActionListener;
 
 public class SetupDialog extends JDialog implements ActionListener {
 
-    private JTextField numVisitorsField;
-    private JTextField diningHallCapacityField;
-    private JTextField numSkatesField;
-    private JTextField numHelmetsField;
-    private JTextField numGlovesField;
-    private JTextField numPenguinsField;
+    private final JTextField numVisitorsField;
+    private final JTextField diningHallCapacityField;
+    private final JTextField numSkatesField;
+    private final JTextField numHelmetsField;
+    private final JTextField numGlovesField;
+    private final JTextField numPenguinsField;
 
-    private JButton startButton;
-    private JButton cancelButton;
+    private final JButton startButton;
 
     public SetupDialog(JFrame parent) {
         super(parent, "Setup Simulation", true);
@@ -36,7 +35,7 @@ public class SetupDialog extends JDialog implements ActionListener {
 
         startButton = new JButton("Start");
         startButton.addActionListener(this);
-        cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(this);
 
         // Create the layout for the dialog
@@ -106,74 +105,76 @@ public class SetupDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == startButton) {
             setVisible(false);
-            synchronized (this) {
-                notifyAll();
-            }
             return;
+        } else {
+            System.exit(0);
         }
     }
 
-    public JTextField getNumVisitorsField() {
-        return numVisitorsField;
-    }
-
     public int getNumVisitors() {
-        return Integer.parseInt(numVisitorsField.getText());
-    }
-
-    public JTextField getDiningHallCapacityField() {
-        return diningHallCapacityField;
+        String input = numVisitorsField.getText();
+        if (input.isEmpty()) {
+            return 0;
+        } else if (!input.matches("\\d+")) { // if not a number
+            return 0;
+        } else {
+            return Integer.parseInt(input);
+        }
     }
 
     public int getDiningHallCapacity() {
-        return Integer.parseInt(diningHallCapacityField.getText());
-    }
-
-    public JTextField getNumSkatesField() {
-        return numSkatesField;
+        String input = diningHallCapacityField.getText();
+        if (input.isEmpty()) {
+            return 0;
+        } else if (!input.matches("\\d+")) { // if not a number
+            return 0;
+        } else {
+            return Integer.parseInt(input);
+        }
     }
 
     public int getNumSkates() {
-        return Integer.parseInt(numSkatesField.getText());
-    }
-
-    public JTextField getNumHelmetsField() {
-        return numHelmetsField;
+        String input = numSkatesField.getText();
+        if (input.isEmpty()) {
+            return 0;
+        } else if (!input.matches("\\d+")) { // if not a number
+            return 0;
+        } else {
+            return Integer.parseInt(input);
+        }
     }
 
     public int getNumHelmets() {
-        return Integer.parseInt(numHelmetsField.getText());
-    }
-
-    public JTextField getNumGlovesField() {
-        return numGlovesField;
+        String input = numHelmetsField.getText();
+        if (input.isEmpty()) {
+            return 0;
+        } else if (!input.matches("\\d+")) { // if not a number
+            return 0;
+        } else {
+            return Integer.parseInt(input);
+        }
     }
 
     public int getNumGloves() {
-        return Integer.parseInt(numGlovesField.getText());
-    }
-
-    public JTextField getNumPenguinsField() {
-        return numPenguinsField;
+        String input = numGlovesField.getText();
+        if (input.isEmpty()) {
+            return 0;
+        } else if (!input.matches("\\d+")) { // if not a number
+            return 0;
+        } else {
+            return Integer.parseInt(input);
+        }
     }
 
     public int getNumPenguins() {
-        return Integer.parseInt(numPenguinsField.getText());
+        String input = numPenguinsField.getText();
+        if (input.isEmpty()) {
+            return 0;
+        } else if (!input.matches("\\d+")) { // if not a number
+            return 0;
+        } else {
+            return Integer.parseInt(input);
+        }
     }
 
-    public JButton getStartButton() {
-        return startButton;
-    }
-
-    public void setStartButton(JButton startButton) {
-        this.startButton = startButton;
-    }
-
-    public JButton getCancelButton() {
-        return cancelButton;
-    }
-
-    public void setCancelButton(JButton cancelButton) {
-        this.cancelButton = cancelButton;
-    }
 }

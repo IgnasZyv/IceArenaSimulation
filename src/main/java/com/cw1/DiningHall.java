@@ -5,18 +5,17 @@ import java.util.concurrent.Semaphore;
 
 public class DiningHall {
     private static DiningHall instance = null;
-    private final Object lock = new Object();
     private final Queue<Visitor> waitingVisitors;
     private final List<Visitor> visitors;
-    private Semaphore semaphore;
+    private final Semaphore semaphore;
 
     private DiningHall() {
         this.visitors = new ArrayList<>();
         this.waitingVisitors = new LinkedList<>();
-        semaphore = new Semaphore(App.getDiningHallCapacity());
+        semaphore = new Semaphore(App.getDiningHallCapacity()); // create a semaphore with the capacity of the dining hall
     }
 
-    public static synchronized DiningHall getInstance() {
+    public static synchronized DiningHall getInstance() { // singleton pattern
         if (instance == null) {
             instance = new DiningHall();
         }
@@ -28,7 +27,9 @@ public class DiningHall {
             DiningHallPanel.getInstance().addVisitor(visitor); // add the visitor to the dining hall panel
             System.out.println(visitor.getId() + " is eating");
             visitors.add(visitor); // add the visitor to the list of visitors in the dining hall
-            Thread.sleep(new Random().nextInt(8000, 20000));
+            int sleepTime = App.skatingDiningSleep();
+            System.out.println(visitor.getId() + " is dining for: " + sleepTime + " ms");
+            Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -60,14 +61,6 @@ public class DiningHall {
         DiningHallPanel.getInstance().removeQueue(visitor); // remove the visitor from the dining hall panel
     }
 
-    public boolean hasWaitingVisitors() {
-        return !waitingVisitors.isEmpty();
-    }
-
-    public Visitor getNextWaitingVisitor() {
-        return waitingVisitors.peek();
-    }
-
     public int getWaitingVisitorsCount() {
         return waitingVisitors.size();
     }
@@ -75,16 +68,5 @@ public class DiningHall {
     public List<Visitor> getVisitors() {
         return visitors;
     }
-//
-//    public void updateSemaphore() {
-//        semaphore = new Semaphore(App.getDiningHallCapacity());
-//    }
 
-//    public void incrementSemaphore() {
-//        semaphore.release();
-//    }
-//
-//    public void decrementSemaphore() throws InterruptedException {
-//        semaphore.acquire();
-//    }
 }

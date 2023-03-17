@@ -1,4 +1,4 @@
-package com.cw1;
+package com.cw1.enums;
 
 public enum OrderStatus {
     Waiting,

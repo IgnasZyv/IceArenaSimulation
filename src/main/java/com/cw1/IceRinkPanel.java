@@ -1,5 +1,7 @@
 package com.cw1;
 
+import com.cw1.enums.OrderStatus;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -7,7 +9,6 @@ import java.util.List;
 
 public class IceRinkPanel extends JPanel {
     private static IceRinkPanel instance = null;
-    private List<Visitor> visitors;
     private List<Visitor> skatingVisitors;
 
     private IceRinkPanel() {
@@ -36,10 +37,6 @@ public class IceRinkPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         int ovalSize = 5;
-//
-//        // Draw ice rink
-//        g.setColor(Color.BLUE);
-//        g.fillRect(0, 0, width, height);
 
         // Draw skaters
         g.setColor(Color.RED);
@@ -61,7 +58,7 @@ public class IceRinkPanel extends JPanel {
             Visitor visitor = visitors.get(i);
             int y = yStart + i * yStep;
 
-            if (visitor.getInQueue()) {
+            if (visitor != null && visitor.getInQueue()) {
                 g.setColor(Color.RED);
             } else {
                 g.setColor(Color.BLACK);
@@ -69,6 +66,7 @@ public class IceRinkPanel extends JPanel {
 
             g.fillOval(xCenter, y - 10, 15, 15);
             g.drawString(visitor.getId(), xCenter + 20, y + 5);
+            // if the visitor is returning order, draw the order in red
             if (visitor.getOrder() != null && visitor.getOrder().getStatus() == OrderStatus.Returning) {
                 g.drawString(visitor.getOrder().getItemList().toString() + " Returning...", xCenter, y + 25);
             } else if (visitor.getOrder() != null) {

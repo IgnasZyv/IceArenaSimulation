@@ -2,14 +2,11 @@ package com.cw1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class SkatingArea {
     private static SkatingArea instance = null;
     private static final Object lock = new Object();
     private static final List<Visitor> skaters = new ArrayList<>();
-    private SimulationFrame simulationFrame;
-    private final Random random = new Random();
 
     private SkatingArea() {
     }
@@ -23,6 +20,7 @@ public class SkatingArea {
 
     public void skate(Visitor visitor) {
         synchronized (lock) {
+            // while the is skating wait
             while (skaters.contains(visitor)) {
                 try {
                     lock.wait();
@@ -30,34 +28,23 @@ public class SkatingArea {
                     e.printStackTrace();
                 }
             }
-            skaters.add(visitor);
+            skaters.add(visitor); // add visitor to skating list
             IceRinkPanel.getInstance().updateSkatingVisitors(skaters);
             QueuePanel.getInstance().removeVisitor(visitor);
             StatisticsPanel.updateSkatingVisitors(skaters.size());
 
-//            List<Visitor> inQueue = App.getVisitors();
-//            inQueue.removeAll(skaters);
-//            QueuePanel.getInstance().updateQueue(inQueue);
         }
         try {
-            System.out.println(visitor.getId() + " is skating");
             visitor.setSkating(true);
-            Thread.sleep(new Random().nextInt(8000, 15000));
+            int sleepTime = App.skatingDiningSleep(); // get random time to skate
+            System.out.println(visitor.getId() + " is skating for: " + sleepTime + " ms");
+            Thread.sleep(sleepTime);
             visitor.setSkating(false);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         synchronized (lock) {
-//            skaters.remove(visitor);
-//            IceRinkPanel.getInstance().updateSkatingVisitors(skaters);
-            System.out.println(visitor.getId() + " has finished skating");
             lock.notifyAll();
-        }
-    }
-
-    public boolean isSkating(Visitor visitor) {
-        synchronized (lock) {
-            return skaters.contains(visitor);
         }
     }
 
